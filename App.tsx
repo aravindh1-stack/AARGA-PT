@@ -18,25 +18,52 @@ const App: React.FC = () => {
 
   // Load data
   useEffect(() => {
-    storageService.seedData();
-    setCustomers(storageService.getCustomers());
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const data = await storageService.getCustomers();
+        if (!cancelled) setCustomers(data);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const refreshData = useCallback(() => {
-    setCustomers(storageService.getCustomers());
+  const refreshData = useCallback(async () => {
+    try {
+      const data = await storageService.getCustomers();
+      setCustomers(data);
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
-  const handleSaveCustomer = (customer: Customer) => {
-    storageService.saveCustomer(customer);
-    refreshData();
-    setEditingCustomer(null);
-    setActiveSection('directory');
+  const handleSaveCustomer = async (customer: Customer) => {
+    try {
+      await storageService.saveCustomer(customer);
+      await refreshData();
+      setEditingCustomer(null);
+      setActiveSection('directory');
+    } catch (e) {
+      console.error(e);
+      window.alert('Failed to save customer to database. Please check API/DB and try again.');
+    }
   };
 
-  const handleDeleteCustomer = (id: string) => {
+  const handleDeleteCustomer = async (id: string) => {
     if (window.confirm('PROTOCOL ALERT: Permanently erase this ecosystem node from master registry?')) {
-      storageService.deleteCustomer(id);
-      refreshData();
+      try {
+        await storageService.deleteCustomer(id);
+        await refreshData();
+      } catch (e) {
+        console.error(e);
+        window.alert('Failed to delete customer from database. Please check API/DB and try again.');
+      }
     }
   };
 
