@@ -8,6 +8,7 @@ export interface Policy {
   companyName: string;
   startDate: string;
   endDate: string;
+  amount: string;
 }
 
 export interface Customer {
