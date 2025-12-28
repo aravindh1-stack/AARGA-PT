@@ -6,6 +6,7 @@ import CustomerList from './components/CustomerList';
 import CustomerForm from './components/CustomerForm';
 import CustomerDetailsModal from './components/CustomerDetailsModal';
 import Calculator from './components/Calculator';
+import LoginPage from './components/LoginPage';
 import { Customer, AppSection } from './types';
 import { storageService } from './services/storageService';
 import { 
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeSection, setActiveSection] = useState<AppSection>('dashboard');
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -54,6 +56,10 @@ const App: React.FC = () => {
     if (section !== 'add-customer') setEditingCustomer(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={() => setIsLoggedIn(true)} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#F8FAFC]">
@@ -98,6 +104,13 @@ const App: React.FC = () => {
                 </button>
              )}
              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => setIsLoggedIn(false)}
+                  className="relative w-12 h-12 rounded-[1rem] bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 transition-all hover:bg-slate-50 group"
+                  title="Secure Logout"
+                >
+                  <User size={22} />
+                </button>
                 <button className="relative w-12 h-12 rounded-[1rem] bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-all hover:bg-slate-50 group">
                   <Bell size={22} />
                   <span className="absolute top-3.5 right-3.5 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white group-hover:scale-110 transition-transform"></span>
